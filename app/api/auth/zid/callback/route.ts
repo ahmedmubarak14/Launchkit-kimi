@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-static";
-
 const ZID_TOKEN_URL = "https://oauth.zid.sa/oauth/token";
 const ZID_API_URL = "https://api.zid.sa/v1";
 
