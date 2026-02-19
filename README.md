@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LaunchKit - AI-Powered E-commerce Store Setup
+
+LaunchKit helps merchants set up their online stores through natural conversation with AI. Instead of filling forms, users describe their business and the AI creates categories, products, and marketing configuration automatically.
+
+## Features
+
+- **AI Chat Interface**: Natural conversation to set up your store
+- **Smart Categories**: AI-suggested category structures in Arabic and English
+- **Product Generation**: AI-generated product listings with descriptions, prices, and variants
+- **Marketing Setup**: Automatic SEO optimization and meta tags
+- **Multi-language**: Full Arabic/English support with RTL layout
+- **Zid Integration**: Connect and sync with Zid e-commerce platform
+
+## Tech Stack
+
+- Next.js 14 with App Router
+- TypeScript
+- Tailwind CSS + shadcn/ui components
+- Supabase for database and auth
+- Zustand for state management
+- Anthropic Claude API for AI chat
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm or pnpm
+- Supabase account
+- Zid Partner account (for store integration)
+- Anthropic API key (for AI features)
+
+### Installation
+
+1. Clone the repository and navigate to the project:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd my-app
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit `.env.local` with your credentials.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up the database in Supabase SQL Editor using `supabase/schema.sql`
 
-## Learn More
+4. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key |
+| `ANTHROPIC_API_KEY` | Anthropic Claude API key |
+| `ZID_CLIENT_ID` | Zid OAuth client ID |
+| `ZID_CLIENT_SECRET` | Zid OAuth client secret |
+| `NEXT_PUBLIC_APP_URL` | Your app URL |
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+├── (auth)/           # Login, signup pages
+├── (dashboard)/       # Protected dashboard
+├── api/             # API routes
+components/
+├── chat/            # Chat components
+├── layout/          # Layout components
+lib/                 # Utilities, store, database types
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT License
