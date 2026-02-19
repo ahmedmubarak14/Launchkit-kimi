@@ -75,16 +75,21 @@ export async function GET(request: NextRequest) {
     const storeDomain = storeData.domain || null;
 
     // Check if store already exists for this user
-    const { data: existingStore } = await supabase
+    const { data: existingStore, error: storeCheckError } = await supabase
       .from("stores")
       .select("*")
       .eq("user_id", user.id)
       .eq("platform", "zid")
-      .single();
+      .maybeSingle();
 
+    if (storeCheckError) {
+      console.error("Store check error:", storeCheckError);
+    }
+
+    let storeResult;
     if (existingStore) {
       // Update existing store
-      await supabase
+      storeResult = await supabase
         .from("stores")
         .update({
           access_token: accessToken,
@@ -93,21 +98,33 @@ export async function GET(request: NextRequest) {
           store_domain: storeDomain,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", existingStore.id);
+        .eq("id", existingStore.id)
+        .select()
+        .single();
     } else {
       // Create new store
-      await supabase.from("stores").insert({
+      storeResult = await supabase.from("stores").insert({
         user_id: user.id,
         platform: "zid",
         access_token: accessToken,
         refresh_token: refreshToken,
         store_name: storeName,
         store_domain: storeDomain,
-      });
+      }).select().single();
     }
 
+    if (storeResult.error) {
+      console.error("Store save error:", storeResult.error);
+      return NextResponse.redirect(
+        new URL("/settings?error=save_failed", request.url)
+      );
+    }
+
+    console.log("Store saved successfully:", storeResult.data);
+
+    // Redirect to setup page with store connected
     return NextResponse.redirect(
-      new URL("/settings?success=connected", request.url)
+      new URL("/setup?success=connected", request.url)
     );
   } catch (error) {
     console.error("Zid callback error:", error);
