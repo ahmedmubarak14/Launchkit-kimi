@@ -8,9 +8,17 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("Missing Supabase environment variables");
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -31,30 +39,34 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // Protected routes - redirect to login if not authenticated
-  if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+    // Protected routes - redirect to login if not authenticated
+    if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
 
-  if (request.nextUrl.pathname.startsWith("/settings") && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+    if (request.nextUrl.pathname.startsWith("/settings") && !user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
 
-  if (request.nextUrl.pathname.startsWith("/setup") && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+    if (request.nextUrl.pathname.startsWith("/setup") && !user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
 
-  // Auth routes - redirect to dashboard if already authenticated
-  if (
-    (request.nextUrl.pathname === "/login" ||
-      request.nextUrl.pathname === "/signup") &&
-    user
-  ) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    // Auth routes - redirect to dashboard if already authenticated
+    if (
+      (request.nextUrl.pathname === "/login" ||
+        request.nextUrl.pathname === "/signup") &&
+      user
+    ) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  } catch (error) {
+    console.error("Middleware auth error:", error);
   }
 
   return response;
