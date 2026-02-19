@@ -18,6 +18,7 @@ export default function SetupPage() {
   const language = useAppStore((state) => state.language);
   const setLanguage = useAppStore((state) => state.setLanguage);
   const currentStore = useAppStore((state) => state.currentStore);
+  const setCurrentStore = useAppStore((state) => state.setCurrentStore);
   const setCurrentSession = useAppStore((state) => state.setCurrentSession);
   const setMessages = useAppStore((state) => state.setMessages);
   const setCategories = useAppStore((state) => state.setCategories);
@@ -27,8 +28,38 @@ export default function SetupPage() {
   const isRTL = language === "ar";
 
   useEffect(() => {
-    initializeSession();
+    // If no current store, try to fetch from Supabase
+    if (!currentStore) {
+      fetchUserStore();
+    } else {
+      initializeSession();
+    }
   }, [currentStore]);
+
+  const fetchUserStore = async () => {
+    const supabase = createClient();
+    
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    // Fetch user's store
+    const { data: store } = await supabase
+      .from("stores")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("platform", "zid")
+      .maybeSingle();
+
+    if (store) {
+      setCurrentStore(store);
+    }
+    
+    setLoading(false);
+  };
 
   const initializeSession = async () => {
     if (!currentStore) {
